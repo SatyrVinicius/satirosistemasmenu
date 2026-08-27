@@ -1,23 +1,45 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { UtensilsCrossed } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { Maximize, Minimize, UtensilsCrossed } from "lucide-react";
 
-import wallpaper from "@/assets/wallpaper.jpg";
-import logo from "@/assets/logo.png";
-import mesa from "@/assets/mesa.png";
+import { supabase } from "@/lib/supabase";
+import wallpaperFallback from "@/assets/wallpaper.jpg";
+import logoFallback from "@/assets/logo.png";
+import mesaFig from "@/assets/mesa.png";
+
+type Lanchonete = {
+  id: number;
+  descricao: string | null;
+  logo: string | null;
+  walpaper: string | null;
+  slogan: string | null;
+  codigo_lanchonete: string | null;
+  amplia: boolean | null;
+};
+
+type Mesa = {
+  id: number;
+  descricao: string | null;
+  link_mesa: string | null;
+};
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    cod: typeof search.cod === "string" ? search.cod : undefined,
+  }),
   head: () => ({
     meta: [
-      { title: "Sátiro Lanches | Lanchonete — Escolha sua Mesa" },
+      { title: "Sátiro Lanches | Escolha sua Mesa" },
       {
         name: "description",
         content:
-          "Sátiro Lanches: hambúrgueres artesanais, porções e bebidas. Escolha sua mesa e faça seu pedido direto pelo celular.",
+          "Sátiro Lanches: escolha sua mesa e faça seu pedido direto pelo celular.",
       },
       { property: "og:title", content: "Sátiro Lanches — Escolha sua Mesa" },
       {
         property: "og:description",
-        content: "Hamburgueria artesanal. Toque na sua mesa e peça agora.",
+        content: "Toque na sua mesa e peça agora.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -26,48 +48,107 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const mesas = ["Mesa 1", "Mesa 2", "Mesa 3", "Mesa 4", "Mesa 5", "Mesa 6"];
-
 function Index() {
+  const { cod } = Route.useSearch();
+  const [fullscreen, setFullscreen] = useState(false);
+
+  const { data: lanchonete } = useQuery({
+    queryKey: ["lanchonete", cod ?? "default"],
+    queryFn: async () => {
+      let q = supabase
+        .from("LANCHONETES")
+        .select("id,descricao,logo,walpaper,slogan,codigo_lanchonete,amplia");
+      if (cod) q = q.eq("codigo_lanchonete", cod);
+      const { data, error } = await q.limit(1);
+      if (error) throw error;
+      return (data?.[0] ?? null) as Lanchonete | null;
+    },
+  });
+
+  const lanchoneteId = lanchonete?.id;
+  const amplia = lanchonete?.amplia === true;
+
+  const { data: mesas } = useQuery({
+    queryKey: ["mesas", lanchoneteId],
+    enabled: !!lanchoneteId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("MESAS")
+        .select("id,descricao,link_mesa")
+        .eq("ref_lanchonete", lanchoneteId!)
+        .order("id");
+      if (error) throw error;
+      return (data ?? []) as Mesa[];
+    },
+  });
+
+  useEffect(() => {
+    const onChange = () => setFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onChange);
+    return () => document.removeEventListener("fullscreenchange", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (!amplia || document.fullscreenElement) return;
+    const enter = () => {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+      window.removeEventListener("pointerdown", enter);
+    };
+    document.documentElement.requestFullscreen?.().catch(() => {
+      // navegadores exigem gesto do usuário: tenta no primeiro toque
+      window.addEventListener("pointerdown", enter, { once: true });
+    });
+    return () => window.removeEventListener("pointerdown", enter);
+  }, [amplia]);
+
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.().catch(() => {});
+    } else {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    }
+  };
+
+  const wallpaper = lanchonete?.walpaper || wallpaperFallback;
+  const logo = lanchonete?.logo || logoFallback;
+
   return (
     <main
       className="flex min-h-screen flex-col bg-cover bg-center bg-fixed"
       style={{ backgroundImage: `url(${wallpaper})` }}
     >
       <div className="flex min-h-screen flex-col bg-black/70 backdrop-blur-[2px]">
-        {/* Logo + descrição */}
         <header className="flex flex-col items-center px-6 pt-12 text-center">
           <img
             src={logo}
-            alt="Logo Sátiro Lanches"
+            alt="Logo da lanchonete"
             width={150}
             height={150}
             className="h-[150px] w-[150px] rounded-full object-cover drop-shadow-[0_6px_20px_rgba(0,0,0,0.6)]"
           />
           <h1 className="mt-6 font-display text-4xl font-extrabold uppercase tracking-wide text-amber-400 sm:text-5xl">
-            Sátiro Lanches
+            {lanchonete?.descricao ?? "Sátiro Lanches"}
           </h1>
-          <p className="mt-3 max-w-xl text-base text-neutral-300 sm:text-lg">
-            Hambúrgueres artesanais no ponto certo, porções generosas e
-            refrigerante gelado. Escolha sua mesa abaixo e faça o pedido sem
-            sair do lugar.
-          </p>
+          {lanchonete?.slogan && (
+            <p className="mt-3 max-w-xl text-base text-neutral-300 sm:text-lg">
+              {lanchonete.slogan}
+            </p>
+          )}
         </header>
 
-        {/* Mesas */}
         <section className="mx-auto w-full max-w-4xl flex-1 px-6 py-14">
           <h2 className="text-center text-sm font-semibold uppercase tracking-[0.3em] text-amber-200/80">
             Toque na sua mesa
           </h2>
           <div className="mt-8 grid grid-cols-2 gap-8 sm:grid-cols-3">
-            {mesas.map((nome, i) => (
+            {(mesas ?? []).map((m, i) => (
               <article
-                key={nome}
+                key={m.id}
                 className="flex flex-col items-center rounded-2xl border border-white/10 bg-black/50 p-5 shadow-xl"
               >
                 <img
-                  src={mesa}
-                  alt={`Figura da ${nome}`}
+                  src={mesaFig}
+                  alt={`Figura da ${m.descricao ?? "mesa"}`}
                   width={512}
                   height={512}
                   loading={i === 0 ? "eager" : "lazy"}
@@ -75,17 +156,39 @@ function Index() {
                 />
                 <button
                   type="button"
+                  onClick={() => {
+                    if (m.link_mesa) window.location.href = m.link_mesa;
+                  }}
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-700 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-amber-100 transition hover:bg-red-600 active:scale-95"
                 >
                   <UtensilsCrossed className="h-4 w-4" />
-                  {nome}
+                  {m.descricao ?? `Mesa ${m.id}`}
                 </button>
               </article>
             ))}
           </div>
+          {mesas && mesas.length === 0 && (
+            <p className="mt-10 text-center text-neutral-300">
+              Nenhuma mesa cadastrada para esta lanchonete.
+            </p>
+          )}
         </section>
 
-        {/* Rodapé */}
+        <div className="flex justify-center pb-6">
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-black/50 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-amber-200 transition hover:bg-black/70 active:scale-95"
+          >
+            {fullscreen ? (
+              <Minimize className="h-4 w-4" />
+            ) : (
+              <Maximize className="h-4 w-4" />
+            )}
+            {fullscreen ? "Desampliar" : "Ampliar"}
+          </button>
+        </div>
+
         <footer className="border-t border-white/10 bg-black/60 px-6 py-6 text-center text-sm text-neutral-300">
           <p className="font-semibold tracking-wide">
             Desenvolvido pela Sátiro Sistemas&nbsp;|&nbsp;(84) 9
