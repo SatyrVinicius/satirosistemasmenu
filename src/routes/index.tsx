@@ -211,21 +211,13 @@ function Index() {
       </div>
 
       {activeLink && (
-        <div className="fixed inset-0 z-50 flex flex-col bg-black">
+        <div className="fixed inset-0 z-50 bg-black">
           <iframe
             src={activeLink}
             title="Webview da mesa"
-            className="flex-1 w-full border-0"
+            className="h-full w-full border-0"
             allow="fullscreen"
           />
-          <button
-            type="button"
-            onClick={() => setActiveLink(null)}
-            aria-label="Voltar"
-            className="fixed bottom-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-xs font-bold uppercase text-amber-100 backdrop-blur-sm transition hover:bg-black/80 active:scale-95"
-          >
-            ←
-          </button>
         </div>
       )}
     </main>
