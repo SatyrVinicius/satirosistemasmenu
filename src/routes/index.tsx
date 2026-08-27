@@ -67,22 +67,26 @@ function Index() {
     },
   });
 
-  const lanchoneteId = lanchonete?.id;
   const amplia = lanchonete?.amplia === true;
+  const refCod = cod ?? lanchonete?.codigo_lanchonete ?? undefined;
 
   const { data: mesas } = useQuery({
-    queryKey: ["mesas", cod],
-    enabled: !!cod,
+    queryKey: ["mesas", refCod],
+    enabled: !!refCod,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("MESAS")
         .select("id,descricao,link_mesa")
-        .eq("ref_lanchonete", cod!)
+        .eq("ref_lanchonete", refCod!)
         .order("id");
       if (error) throw error;
       return (data ?? []) as Mesa[];
     },
   });
+
 
   useEffect(() => {
     const onChange = () => setFullscreen(!!document.fullscreenElement);
