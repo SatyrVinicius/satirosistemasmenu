@@ -71,13 +71,13 @@ function Index() {
   const amplia = lanchonete?.amplia === true;
 
   const { data: mesas } = useQuery({
-    queryKey: ["mesas", lanchoneteId],
-    enabled: !!lanchoneteId,
+    queryKey: ["mesas", cod],
+    enabled: !!cod,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("MESAS")
         .select("id,descricao,link_mesa")
-        .eq("ref_lanchonete", lanchoneteId!)
+        .eq("ref_lanchonete", cod!)
         .order("id");
       if (error) throw error;
       return (data ?? []) as Mesa[];
