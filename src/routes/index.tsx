@@ -1,24 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Ruler, Hammer, Truck, ShieldCheck, ArrowRight } from "lucide-react";
+import { UtensilsCrossed } from "lucide-react";
 
-import mesa1 from "@/assets/mesa-1.jpg";
-import mesa2 from "@/assets/mesa-2.jpg";
-import mesa3 from "@/assets/mesa-3.jpg";
-import mesa4 from "@/assets/mesa-4.jpg";
+import wallpaper from "@/assets/wallpaper.jpg";
+import logo from "@/assets/logo.png";
+import mesa from "@/assets/mesa.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Mesas Marcenaria Sátiro | Catálogo de Mesas Artesanais" },
+      { title: "Sátiro Lanches | Lanchonete — Escolha sua Mesa" },
       {
         name: "description",
         content:
-          "Catálogo de mesas artesanais: mesa de jantar em carvalho, mesa redonda, mesa lateral e mesa industrial. Veja figura e descrição de cada mesa.",
+          "Sátiro Lanches: hambúrgueres artesanais, porções e bebidas. Escolha sua mesa e faça seu pedido direto pelo celular.",
       },
-      { property: "og:title", content: "Catálogo de Mesas Artesanais" },
+      { property: "og:title", content: "Sátiro Lanches — Escolha sua Mesa" },
       {
         property: "og:description",
-        content: "Quatro modelos de mesa com figura, descrição e orçamento direto.",
+        content: "Hamburgueria artesanal. Toque na sua mesa e peça agora.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -27,130 +26,73 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const mesas = [
-  {
-    img: mesa1,
-    nome: "Mesa Carvalho",
-    descricao: "Mesa de jantar em carvalho maciço, pés cônicos, 8 lugares.",
-    medida: "220 × 95 cm",
-  },
-  {
-    img: mesa2,
-    nome: "Mesa Redonda",
-    descricao: "Tampo em pedra clara com base tubular de aço preto.",
-    medida: "Ø 110 cm",
-  },
-  {
-    img: mesa3,
-    nome: "Mesa Lateral",
-    descricao: "Mesa de apoio em nogueira com tampo de vidro temperado.",
-    medida: "Ø 50 cm",
-  },
-  {
-    img: mesa4,
-    nome: "Mesa Industrial",
-    descricao: "Estrutura em aço preto e tampo de madeira de demolição.",
-    medida: "180 × 80 cm",
-  },
-];
-
-const servicos = [
-  { icon: Ruler, titulo: "Sob medida", texto: "Cada mesa ajustada ao seu espaço." },
-  { icon: Hammer, titulo: "Feito à mão", texto: "Marcenaria tradicional, peça a peça." },
-  { icon: Truck, titulo: "Entrega montada", texto: "Chega pronta para usar." },
-  { icon: ShieldCheck, titulo: "5 anos", texto: "Garantia total de estrutura." },
-];
+const mesas = ["Mesa 1", "Mesa 2", "Mesa 3", "Mesa 4", "Mesa 5", "Mesa 6"];
 
 function Index() {
   return (
-    <main className="min-h-screen bg-background">
-      <header className="border-b-[3px] border-foreground">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-5">
-          <span className="font-display text-lg font-bold uppercase tracking-[0.2em]">
-            Mesas
-          </span>
-          <nav className="hidden gap-8 text-sm font-semibold uppercase tracking-widest sm:flex">
-            <a href="#catalogo" className="hover:text-accent">
-              Catálogo
-            </a>
-            <a href="#servicos" className="hover:text-accent">
-              Serviços
-            </a>
-          </nav>
-          <a href="#catalogo" className="btn-solid text-xs">
-            Orçamento
-          </a>
-        </div>
-      </header>
+    <main
+      className="flex min-h-screen flex-col bg-cover bg-center bg-fixed"
+      style={{ backgroundImage: `url(${wallpaper})` }}
+    >
+      <div className="flex min-h-screen flex-col bg-black/70 backdrop-blur-[2px]">
+        {/* Logo + descrição */}
+        <header className="flex flex-col items-center px-6 pt-12 text-center">
+          <img
+            src={logo}
+            alt="Logo Sátiro Lanches"
+            width={150}
+            height={150}
+            className="h-[150px] w-[150px] rounded-full object-cover drop-shadow-[0_6px_20px_rgba(0,0,0,0.6)]"
+          />
+          <h1 className="mt-6 font-display text-4xl font-extrabold uppercase tracking-wide text-amber-400 sm:text-5xl">
+            Sátiro Lanches
+          </h1>
+          <p className="mt-3 max-w-xl text-base text-neutral-300 sm:text-lg">
+            Hambúrgueres artesanais no ponto certo, porções generosas e
+            refrigerante gelado. Escolha sua mesa abaixo e faça o pedido sem
+            sair do lugar.
+          </p>
+        </header>
 
-      <section className="mx-auto max-w-6xl px-6 py-20">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-muted-foreground">
-          Marcenaria artesanal
-        </p>
-        <h1 className="mt-4 max-w-3xl text-5xl font-bold leading-[1.05] sm:text-6xl">
-          Quatro mesas. Uma para cada jeito de viver a casa.
-        </h1>
-        <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-          Figura, descrição e medida de cada modelo — escolha a sua e peça um orçamento
-          sem compromisso.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-4">
-          <a href="#catalogo" className="btn-solid">
-            Ver as mesas <ArrowRight className="h-4 w-4" />
-          </a>
-          <a href="#servicos" className="btn-outline">
-            Como fazemos
-          </a>
-        </div>
-      </section>
-
-      <section id="catalogo" className="mx-auto max-w-6xl px-6 pb-20">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          {mesas.map((m, i) => (
-            <article key={m.nome} className="flex flex-col">
-              <div className="frame bg-card">
+        {/* Mesas */}
+        <section className="mx-auto w-full max-w-4xl flex-1 px-6 py-14">
+          <h2 className="text-center text-sm font-semibold uppercase tracking-[0.3em] text-amber-200/80">
+            Toque na sua mesa
+          </h2>
+          <div className="mt-8 grid grid-cols-2 gap-8 sm:grid-cols-3">
+            {mesas.map((nome, i) => (
+              <article
+                key={nome}
+                className="flex flex-col items-center rounded-2xl border border-white/10 bg-black/50 p-5 shadow-xl"
+              >
                 <img
-                  src={m.img}
-                  alt={`${m.nome} — ${m.descricao}`}
-                  width={800}
-                  height={800}
+                  src={mesa}
+                  alt={`Figura da ${nome}`}
+                  width={512}
+                  height={512}
                   loading={i === 0 ? "eager" : "lazy"}
-                  className="aspect-square w-full object-cover"
+                  className="h-28 w-28 object-contain"
                 />
-              </div>
-              <h2 className="mt-5 text-lg font-bold uppercase tracking-wide">{m.nome}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{m.descricao}</p>
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.2em]">
-                {m.medida}
-              </p>
-              <a href="#servicos" className="btn-outline mt-4 text-xs">
-                Detalhes
-              </a>
-            </article>
-          ))}
-        </div>
-      </section>
+                <button
+                  type="button"
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-700 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-amber-100 transition hover:bg-red-600 active:scale-95"
+                >
+                  <UtensilsCrossed className="h-4 w-4" />
+                  {nome}
+                </button>
+              </article>
+            ))}
+          </div>
+        </section>
 
-      <section id="servicos" className="border-y-[3px] border-foreground bg-secondary">
-        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-16 sm:grid-cols-2 lg:grid-cols-4">
-          {servicos.map((s) => (
-            <div key={s.titulo}>
-              <s.icon className="h-8 w-8" strokeWidth={2.5} />
-              <h3 className="mt-4 text-base font-bold uppercase tracking-wide">
-                {s.titulo}
-              </h3>
-              <p className="mt-1 text-sm text-muted-foreground">{s.texto}</p>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <footer className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-10 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-        <span>© 2026 Mesas — marcenaria artesanal.</span>
-        <span className="font-semibold uppercase tracking-widest text-foreground">
-          contato@mesas.com.br
-        </span>
-      </footer>
+        {/* Rodapé */}
+        <footer className="border-t border-white/10 bg-black/60 px-6 py-6 text-center text-sm text-neutral-300">
+          <p className="font-semibold tracking-wide">
+            Desenvolvido pela Sátiro Sistemas&nbsp;|&nbsp;(84) 9
+            3300-4200&nbsp;|&nbsp;@satirosistemas
+          </p>
+        </footer>
+      </div>
     </main>
   );
 }
