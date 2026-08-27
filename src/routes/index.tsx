@@ -121,7 +121,7 @@ function Index() {
   return (
     <main
       className="flex min-h-screen flex-col bg-cover bg-center bg-fixed"
-      style={{ backgroundImage: `url(${wallpaper})` }}
+      style={{ backgroundImage: `url("${wallpaper.replace(/"/g, '%22')}")` }}
     >
       <div className="flex min-h-screen flex-col bg-black/70 backdrop-blur-[2px]">
         <header className="flex flex-col items-center px-6 pt-12 text-center">
