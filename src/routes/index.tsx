@@ -209,6 +209,27 @@ function Index() {
           </p>
         </footer>
       </div>
+
+      {activeLink && (
+        <div className="fixed inset-0 z-50 flex flex-col bg-black">
+          <div className="flex items-center justify-between bg-neutral-900 px-4 py-3">
+            <p className="truncate text-sm text-neutral-300">{activeLink}</p>
+            <button
+              type="button"
+              onClick={() => setActiveLink(null)}
+              className="rounded-full bg-red-700 px-4 py-2 text-sm font-bold uppercase text-amber-100 transition hover:bg-red-600 active:scale-95"
+            >
+              Voltar
+            </button>
+          </div>
+          <iframe
+            src={activeLink}
+            title="Webview da mesa"
+            className="flex-1 w-full border-0"
+            allow="fullscreen"
+          />
+        </div>
+      )}
     </main>
   );
 }
