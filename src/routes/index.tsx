@@ -25,8 +25,10 @@ type Mesa = {
 };
 
 export const Route = createFileRoute("/")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    cod: typeof search.cod === "string" ? search.cod : undefined,
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { cod?: string | undefined } => ({
+    cod: typeof search["cod"] === "string" ? search["cod"] : undefined,
   }),
   head: () => ({
     meta: [
