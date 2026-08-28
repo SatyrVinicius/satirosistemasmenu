@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Maximize, Minimize, RefreshCw, UtensilsCrossed } from "lucide-react";
-import { toast } from "sonner";
+
 
 import { supabase } from "@/lib/supabase";
 import wallpaperFallback from "@/assets/wallpaper.jpg";
