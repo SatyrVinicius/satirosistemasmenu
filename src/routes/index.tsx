@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { Maximize, Minimize, UtensilsCrossed } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Maximize, Minimize, RefreshCw, UtensilsCrossed } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import wallpaperFallback from "@/assets/wallpaper.jpg";
@@ -53,6 +53,30 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
+  const [activeLink, setActiveLink] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  const openWebview = (link: string) => {
+    const href = /^https?:\/\//i.test(link) ? link : `https://${link}`;
+    window.history.pushState({ webview: true }, "");
+    setActiveLink(href);
+  };
+
+  useEffect(() => {
+    const onPop = () => setActiveLink(null);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  useEffect(() => {
+    if (!activeLink) return;
+    document.documentElement.style.overscrollBehaviorY = "none";
+    document.body.style.overscrollBehaviorY = "none";
+    return () => {
+      document.documentElement.style.overscrollBehaviorY = "";
+      document.body.style.overscrollBehaviorY = "";
+    };
+  }, [activeLink]);
 
 
 
@@ -253,10 +277,7 @@ function Index() {
                   type="button"
                   onClick={() => {
                     if (!m.link_mesa) return;
-                    const href = /^https?:\/\//i.test(m.link_mesa)
-                      ? m.link_mesa
-                      : `https://${m.link_mesa}`;
-                    window.location.href = href;
+                    openWebview(m.link_mesa);
                   }}
 
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-700 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-amber-100 transition hover:bg-red-600 active:scale-95"
@@ -296,6 +317,29 @@ function Index() {
           </p>
         </footer>
       </div>
+
+      {activeLink && (
+        <div className="fixed inset-0 z-50 bg-black">
+          <button
+            type="button"
+            onClick={() => {
+              const el = iframeRef.current;
+              if (el) el.src = el.src;
+            }}
+            aria-label="Atualizar página"
+            className="absolute left-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white/90 transition hover:bg-black/70 active:scale-95"
+          >
+            <RefreshCw className="h-5 w-5" />
+          </button>
+          <iframe
+            ref={iframeRef}
+            src={activeLink}
+            title="Webview"
+            className="h-full w-full border-0"
+            allow="fullscreen"
+          />
+        </div>
+      )}
     </main>
   );
 }
