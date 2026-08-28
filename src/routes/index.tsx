@@ -278,10 +278,7 @@ function Index() {
                   type="button"
                   onClick={() => {
                     if (!m.link_mesa) return;
-                    const href = /^https?:\/\//i.test(m.link_mesa)
-                      ? m.link_mesa
-                      : `https://${m.link_mesa}`;
-                    window.location.href = href;
+                    openWebview(m.link_mesa);
                   }}
 
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-700 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-amber-100 transition hover:bg-red-600 active:scale-95"
