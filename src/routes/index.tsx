@@ -112,6 +112,21 @@ function Index() {
     return () => window.removeEventListener("pointerdown", enter);
   }, [amplia]);
 
+  // fecha o webview com a seta "voltar" do navegador
+  useEffect(() => {
+    if (!activeLink) return;
+    window.history.pushState({ webview: true }, "");
+    const onPop = () => setActiveLink(null);
+    window.addEventListener("popstate", onPop);
+    const prev = document.body.style.overscrollBehaviorY;
+    document.body.style.overscrollBehaviorY = "none";
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      document.body.style.overscrollBehaviorY = prev;
+    };
+  }, [activeLink]);
+
+
   const toggleFullscreen = () => {
     if (document.fullscreenElement) {
       document.exitFullscreen?.().catch(() => {});
