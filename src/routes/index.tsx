@@ -166,20 +166,21 @@ function Index() {
     return (
       <div className="fixed inset-0 z-50 bg-black">
         <iframe
-          key={reloadKey}
-          src={
-            reloadKey === 0
-              ? activeLink
-              : `${activeLink}${activeLink.includes("?") ? "&" : "?"}_r=${reloadKey}`
-          }
+          ref={iframeRef}
+          src={activeLink}
           title="Cardápio da mesa"
           className="h-full w-full border-0"
           allow="clipboard-write; geolocation; camera; microphone; payment"
         />
-        {/* botão de atualizar no canto superior esquerdo */}
+        {/* botão de atualizar no canto superior esquerdo — recarrega com cache */}
         <button
           type="button"
-          onClick={() => setReloadKey(Date.now())}
+          onClick={() => {
+            const iframe = iframeRef.current;
+            if (!iframe) return;
+            // recarrega o iframe respeitando o cache do navegador
+            iframe.src = iframe.src;
+          }}
           className="absolute top-3 left-3 z-10 rounded-full bg-black/70 p-2.5 text-amber-300 shadow-lg backdrop-blur-sm transition hover:bg-black/90 active:scale-95"
           aria-label="Atualizar página"
         >
