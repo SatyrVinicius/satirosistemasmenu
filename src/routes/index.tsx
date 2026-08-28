@@ -54,6 +54,9 @@ function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const refreshing = useRef(false);
 
   const { data: lanchonete } = useQuery({
     queryKey: ["lanchonete", cod ?? "default"],
