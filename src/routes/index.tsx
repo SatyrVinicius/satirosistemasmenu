@@ -118,11 +118,14 @@ function Index() {
     window.history.pushState({ webview: true }, "");
     const onPop = () => setActiveLink(null);
     window.addEventListener("popstate", onPop);
-    const prev = document.body.style.overscrollBehaviorY;
+    const prevBody = document.body.style.overscrollBehaviorY;
+    const prevHtml = document.documentElement.style.overscrollBehaviorY;
     document.body.style.overscrollBehaviorY = "none";
+    document.documentElement.style.overscrollBehaviorY = "none";
     return () => {
       window.removeEventListener("popstate", onPop);
-      document.body.style.overscrollBehaviorY = prev;
+      document.body.style.overscrollBehaviorY = prevBody;
+      document.documentElement.style.overscrollBehaviorY = prevHtml;
     };
   }, [activeLink]);
 
@@ -173,7 +176,7 @@ function Index() {
         />
         {/* faixa no topo para o gesto de puxar-para-atualizar */}
         <div
-          className="absolute inset-x-0 top-0 h-8"
+          className="absolute inset-x-0 top-0 h-12"
           style={{ touchAction: "none" }}
           onTouchStart={(e) => {
             startY = e.touches[0]?.clientY ?? 0;
