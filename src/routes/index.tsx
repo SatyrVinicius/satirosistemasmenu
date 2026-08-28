@@ -367,18 +367,18 @@ function Index() {
               const el = iframeRef.current;
               if (!el) return;
 
-              let currentUrl = activeLink;
+              let currentUrl: string | null = null;
               try {
                 const href = el.contentWindow?.location?.href;
-                if (href) currentUrl = href;
+                if (href && href !== "about:blank") currentUrl = href;
               } catch {
                 // cross-origin: não é possível ler a URL atual do iframe
               }
 
-              if (currentUrl.includes("/pedido/")) {
-                toast.success("Pedido realizado com sucesso!", {
-                  duration: 2000,
-                });
+              if (currentUrl && currentUrl.includes("/pedido/")) {
+                setShowPedidoPopup(true);
+                if (popupTimeoutRef.current) clearTimeout(popupTimeoutRef.current);
+                popupTimeoutRef.current = setTimeout(() => setShowPedidoPopup(false), 2000);
               }
 
               el.src = el.src;
@@ -396,8 +396,19 @@ function Index() {
             allow="fullscreen"
             onLoad={resetInactivityTimer}
           />
+
+          {showPedidoPopup && (
+            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/50 p-6">
+              <div className="rounded-2xl bg-card px-8 py-6 text-center shadow-2xl">
+                <p className="text-lg font-semibold text-card-foreground">
+                  Pedido realizado com sucesso!
+                </p>
+              </div>
+            </div>
+          )}
         </div>
       )}
+
     </main>
   );
 }
