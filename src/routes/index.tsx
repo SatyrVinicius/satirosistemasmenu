@@ -327,7 +327,7 @@ function Index() {
               if (el) el.src = el.src;
             }}
             aria-label="Atualizar página"
-            className="absolute left-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white/90 transition hover:bg-black/70 active:scale-95"
+            className="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white/90 transition hover:bg-black/70 active:scale-95"
           >
             <RefreshCw className="h-5 w-5" />
           </button>
