@@ -56,6 +56,21 @@ function Index() {
   const [fullscreen, setFullscreen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const refreshWebview = () => {
+    const el = iframeRef.current;
+    if (el) el.src = el.src;
+  };
+
+  const resetInactivityTimer = () => {
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current);
+    }
+    inactivityTimeoutRef.current = setTimeout(() => {
+      refreshWebview();
+    }, 20 * 60 * 1000);
+  };
 
   const openWebview = (link: string) => {
     const href = /^https?:\/\//i.test(link) ? link : `https://${link}`;
