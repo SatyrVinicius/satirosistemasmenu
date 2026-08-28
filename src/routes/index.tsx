@@ -69,14 +69,13 @@ function Index() {
   }, []);
 
   useEffect(() => {
-    if (activeLink) {
-      document.documentElement.style.overscrollBehaviorY = "none";
-      document.body.style.overscrollBehaviorY = "none";
-      return () => {
-        document.documentElement.style.overscrollBehaviorY = "";
-        document.body.style.overscrollBehaviorY = "";
-      };
-    }
+    if (!activeLink) return;
+    document.documentElement.style.overscrollBehaviorY = "none";
+    document.body.style.overscrollBehaviorY = "none";
+    return () => {
+      document.documentElement.style.overscrollBehaviorY = "";
+      document.body.style.overscrollBehaviorY = "";
+    };
   }, [activeLink]);
 
 
