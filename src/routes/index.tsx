@@ -56,6 +56,21 @@ function Index() {
   const [fullscreen, setFullscreen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const refreshWebview = () => {
+    const el = iframeRef.current;
+    if (el) el.src = el.src;
+  };
+
+  const resetInactivityTimer = () => {
+    if (inactivityTimeoutRef.current) {
+      clearTimeout(inactivityTimeoutRef.current);
+    }
+    inactivityTimeoutRef.current = setTimeout(() => {
+      refreshWebview();
+    }, 20 * 60 * 1000);
+  };
 
   const openWebview = (link: string) => {
     const href = /^https?:\/\//i.test(link) ? link : `https://${link}`;
@@ -81,6 +96,26 @@ function Index() {
     return () => {
       document.documentElement.style.overscrollBehaviorY = "";
       document.body.style.overscrollBehaviorY = "";
+    };
+  }, [activeLink]);
+
+  useEffect(() => {
+    if (!activeLink) return;
+
+    const interactionEvents = ["pointerdown", "touchstart", "click", "keydown", "scroll"];
+    interactionEvents.forEach((event) => {
+      window.addEventListener(event, resetInactivityTimer, { passive: true });
+    });
+
+    resetInactivityTimer();
+
+    return () => {
+      interactionEvents.forEach((event) => {
+        window.removeEventListener(event, resetInactivityTimer);
+      });
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
     };
   }, [activeLink]);
 
@@ -359,6 +394,7 @@ function Index() {
             title="Webview"
             className="h-full w-full border-0"
             allow="fullscreen"
+            onLoad={resetInactivityTimer}
           />
         </div>
       )}
