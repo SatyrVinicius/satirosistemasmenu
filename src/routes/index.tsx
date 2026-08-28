@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { Maximize, Minimize, UtensilsCrossed } from "lucide-react";
+import { Maximize, Minimize, RefreshCw, UtensilsCrossed } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import wallpaperFallback from "@/assets/wallpaper.jpg";
