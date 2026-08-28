@@ -53,6 +53,31 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
+  const [activeLink, setActiveLink] = useState<string | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  const openWebview = (link: string) => {
+    const href = /^https?:\/\//i.test(link) ? link : `https://${link}`;
+    window.history.pushState({ webview: true }, "");
+    setActiveLink(href);
+  };
+
+  useEffect(() => {
+    const onPop = () => setActiveLink(null);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  useEffect(() => {
+    if (activeLink) {
+      document.documentElement.style.overscrollBehaviorY = "none";
+      document.body.style.overscrollBehaviorY = "none";
+      return () => {
+        document.documentElement.style.overscrollBehaviorY = "";
+        document.body.style.overscrollBehaviorY = "";
+      };
+    }
+  }, [activeLink]);
 
 
 
