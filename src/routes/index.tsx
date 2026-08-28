@@ -166,7 +166,11 @@ function Index() {
       <div className="fixed inset-0 z-50 bg-black">
         <iframe
           key={reloadKey}
-          src={activeLink}
+          src={
+            reloadKey === 0
+              ? activeLink
+              : `${activeLink}${activeLink.includes("?") ? "&" : "?"}_r=${reloadKey}`
+          }
           title="Cardápio da mesa"
           className="h-full w-full border-0"
           allow="clipboard-write; geolocation; camera; microphone; payment"
@@ -174,12 +178,13 @@ function Index() {
         {/* botão de atualizar no canto superior esquerdo */}
         <button
           type="button"
-          onClick={() => setReloadKey((k) => k + 1)}
+          onClick={() => setReloadKey(Date.now())}
           className="absolute top-3 left-3 z-10 rounded-full bg-black/70 p-2.5 text-amber-300 shadow-lg backdrop-blur-sm transition hover:bg-black/90 active:scale-95"
           aria-label="Atualizar página"
         >
           <RefreshCw className="h-5 w-5" />
         </button>
+
       </div>
     );
   }
