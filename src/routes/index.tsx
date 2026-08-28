@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { Maximize, Minimize, RefreshCw, UtensilsCrossed } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Maximize, Minimize, UtensilsCrossed } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import wallpaperFallback from "@/assets/wallpaper.jpg";
@@ -53,8 +53,6 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
-  const [activeLink, setActiveLink] = useState<string | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
 
 
