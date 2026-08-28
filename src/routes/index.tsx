@@ -110,22 +110,6 @@ function Index() {
     return () => window.removeEventListener("pointerdown", enter);
   }, [amplia]);
 
-  // fecha o webview com a seta "voltar" do navegador
-  useEffect(() => {
-    if (!activeLink) return;
-    window.history.pushState({ webview: true }, "");
-    const onPop = () => setActiveLink(null);
-    window.addEventListener("popstate", onPop);
-    const prevBody = document.body.style.overscrollBehaviorY;
-    const prevHtml = document.documentElement.style.overscrollBehaviorY;
-    document.body.style.overscrollBehaviorY = "none";
-    document.documentElement.style.overscrollBehaviorY = "none";
-    return () => {
-      window.removeEventListener("popstate", onPop);
-      document.body.style.overscrollBehaviorY = prevBody;
-      document.documentElement.style.overscrollBehaviorY = prevHtml;
-    };
-  }, [activeLink]);
 
 
   const toggleFullscreen = () => {
