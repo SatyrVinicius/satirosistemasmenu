@@ -55,7 +55,6 @@ function Index() {
   const [fullscreen, setFullscreen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
-  const [pullY, setPullY] = useState(0);
 
 
   const { data: lanchonete } = useQuery({
@@ -163,8 +162,6 @@ function Index() {
   }
 
   if (activeLink) {
-    let startY = 0;
-    let pulling = false;
     return (
       <div className="fixed inset-0 z-50 bg-black">
         <iframe
@@ -174,38 +171,15 @@ function Index() {
           className="h-full w-full border-0"
           allow="clipboard-write; geolocation; camera; microphone; payment"
         />
-        {/* faixa no topo para o gesto de puxar-para-atualizar */}
-        <div
-          className="absolute inset-x-0 top-0 h-12"
-          style={{ touchAction: "none" }}
-          onTouchStart={(e) => {
-            startY = e.touches[0]?.clientY ?? 0;
-            pulling = true;
-          }}
-          onTouchMove={(e) => {
-            if (!pulling) return;
-            const dy = (e.touches[0]?.clientY ?? 0) - startY;
-            setPullY(Math.max(0, Math.min(dy, 120)));
-          }}
-          onTouchEnd={() => {
-            pulling = false;
-            if (pullY > 70) setReloadKey((k) => k + 1);
-            setPullY(0);
-          }}
-        />
-        {pullY > 0 && (
-          <div
-            className="pointer-events-none absolute inset-x-0 top-0 flex justify-center"
-            style={{ transform: `translateY(${pullY * 0.6}px)` }}
-          >
-            <div className="mt-2 rounded-full bg-black/70 p-2 text-amber-300">
-              <RefreshCw
-                className="h-5 w-5"
-                style={{ transform: `rotate(${pullY * 3}deg)` }}
-              />
-            </div>
-          </div>
-        )}
+        {/* botão de atualizar no canto superior esquerdo */}
+        <button
+          type="button"
+          onClick={() => setReloadKey((k) => k + 1)}
+          className="absolute top-3 left-3 z-10 rounded-full bg-black/70 p-2.5 text-amber-300 shadow-lg backdrop-blur-sm transition hover:bg-black/90 active:scale-95"
+          aria-label="Atualizar página"
+        >
+          <RefreshCw className="h-5 w-5" />
+        </button>
       </div>
     );
   }
