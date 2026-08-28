@@ -55,22 +55,23 @@ function Index() {
   const [fullscreen, setFullscreen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
 
-
   const { data: lanchonete } = useQuery({
     queryKey: ["lanchonete", cod ?? "default"],
+    enabled: !!cod,
     queryFn: async () => {
-      let q = supabase
+      const { data, error } = await supabase
         .from("LANCHONETES")
-        .select("id,descricao,logo,walpaper,slogan,codigo_lanchonete,amplia");
-      if (cod) q = q.eq("codigo_lanchonete", cod);
-      const { data, error } = await q.limit(1);
+        .select("id,descricao,logo,walpaper,slogan,codigo_lanchonete,amplia")
+        .eq("codigo_lanchonete", cod)
+        .limit(1)
+        .single();
       if (error) throw error;
-      return (data?.[0] ?? null) as Lanchonete | null;
+      return data as Lanchonete | null;
     },
   });
 
   const amplia = lanchonete?.amplia === true;
-  const refCod = cod ?? lanchonete?.codigo_lanchonete ?? undefined;
+  const refCod = lanchonete?.codigo_lanchonete ?? undefined;
 
   const { data: mesas } = useQuery({
     queryKey: ["mesas", refCod],
@@ -120,6 +121,27 @@ function Index() {
   const wallpaper = lanchonete?.walpaper || wallpaperFallback;
   const logo = lanchonete?.logo || logoFallback;
 
+  if (!cod || !lanchonete) {
+    return (
+      <main
+        className="flex min-h-screen flex-col items-center justify-center bg-cover bg-center bg-fixed px-6"
+        style={{ backgroundImage: `url("${wallpaperFallback.replace(/"/g, '%22')}")` }}
+      >
+        <div className="flex min-h-screen w-full flex-col items-center justify-center bg-black/80 backdrop-blur-[2px]">
+          <div className="max-w-md rounded-2xl border border-white/10 bg-black/60 p-8 text-center shadow-xl">
+            <UtensilsCrossed className="mx-auto h-12 w-12 text-amber-400" />
+            <h1 className="mt-4 font-display text-2xl font-bold uppercase tracking-wide text-amber-400">
+              Lanchonete não encontrada
+            </h1>
+            <p className="mt-2 text-neutral-300">
+              Informe um código válido na URL, por exemplo: <code className="rounded bg-white/10 px-1.5 py-0.5 text-amber-200">/?cod=teste</code>
+            </p>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main
       className="flex min-h-screen flex-col bg-cover bg-center bg-fixed"
@@ -135,9 +157,9 @@ function Index() {
             className="h-[150px] w-[150px] rounded-full object-cover drop-shadow-[0_6px_20px_rgba(0,0,0,0.6)]"
           />
           <h1 className="mt-6 font-display text-4xl font-extrabold uppercase tracking-wide text-amber-400 sm:text-5xl">
-            {lanchonete?.descricao ?? "Sátiro Lanches"}
+            {lanchonete.descricao ?? "Sátiro Lanches"}
           </h1>
-          {lanchonete?.slogan && (
+          {lanchonete.slogan && (
             <p className="mt-3 max-w-xl text-base text-neutral-300 sm:text-lg">
               {lanchonete.slogan}
             </p>
