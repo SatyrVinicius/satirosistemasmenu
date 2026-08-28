@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Maximize, Minimize, UtensilsCrossed } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
@@ -53,10 +53,6 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
-  const [activeLink, setActiveLink] = useState<string | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const touchStartY = useRef<number | null>(null);
-  const refreshing = useRef(false);
 
   const { data: lanchonete } = useQuery({
     queryKey: ["lanchonete", cod ?? "default"],
@@ -93,61 +89,11 @@ function Index() {
     },
   });
 
-
   useEffect(() => {
     const onChange = () => setFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", onChange);
     return () => document.removeEventListener("fullscreenchange", onChange);
   }, []);
-
-  useEffect(() => {
-    if (!activeLink) {
-      document.body.style.overscrollBehaviorY = "";
-      return;
-    }
-
-    document.body.style.overscrollBehaviorY = "none";
-
-    const onTouchStart = (e: TouchEvent) => {
-      touchStartY.current = e.touches[0]?.clientY ?? null;
-    };
-
-    const onTouchMove = (e: TouchEvent) => {
-      if (touchStartY.current == null) return;
-      const y = e.touches[0]?.clientY ?? touchStartY.current;
-      const delta = y - touchStartY.current;
-      const atTop = window.scrollY <= 0;
-
-      if (atTop && delta > 80 && !refreshing.current) {
-        e.preventDefault();
-        refreshing.current = true;
-        const iframe = iframeRef.current;
-        if (iframe) {
-          const currentSrc = iframe.src;
-          iframe.src = "about:blank";
-          setTimeout(() => {
-            iframe.src = currentSrc;
-            refreshing.current = false;
-          }, 80);
-        }
-      }
-    };
-
-    const onTouchEnd = () => {
-      touchStartY.current = null;
-    };
-
-    window.addEventListener("touchstart", onTouchStart, { passive: true });
-    window.addEventListener("touchmove", onTouchMove, { passive: false });
-    window.addEventListener("touchend", onTouchEnd, { passive: true });
-
-    return () => {
-      window.removeEventListener("touchstart", onTouchStart);
-      window.removeEventListener("touchmove", onTouchMove);
-      window.removeEventListener("touchend", onTouchEnd);
-      document.body.style.overscrollBehaviorY = "";
-    };
-  }, [activeLink]);
 
   useEffect(() => {
     if (!amplia || document.fullscreenElement) return;
@@ -243,9 +189,8 @@ function Index() {
                     const href = /^https?:\/\//i.test(m.link_mesa)
                       ? m.link_mesa
                       : `https://${m.link_mesa}`;
-                    setActiveLink(href);
+                    window.open(href, "_blank", "noopener,noreferrer");
                   }}
-
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-700 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-amber-100 transition hover:bg-red-600 active:scale-95"
                 >
                   <UtensilsCrossed className="h-4 w-4" />
@@ -283,18 +228,6 @@ function Index() {
           </p>
         </footer>
       </div>
-
-      {activeLink && (
-        <div className="fixed inset-0 z-50 bg-black">
-          <iframe
-            ref={iframeRef}
-            src={activeLink}
-            title="Webview da mesa"
-            className="h-full w-full border-0"
-            allow="fullscreen"
-          />
-        </div>
-      )}
     </main>
   );
 }
