@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 import { Maximize, Minimize, RefreshCw, UtensilsCrossed } from "lucide-react";
+import { toast } from "sonner";
 
 import { supabase } from "@/lib/supabase";
 import wallpaperFallback from "@/assets/wallpaper.jpg";
@@ -329,7 +330,23 @@ function Index() {
             type="button"
             onClick={() => {
               const el = iframeRef.current;
-              if (el) el.src = el.src;
+              if (!el) return;
+
+              let currentUrl = activeLink;
+              try {
+                const href = el.contentWindow?.location?.href;
+                if (href) currentUrl = href;
+              } catch {
+                // cross-origin: não é possível ler a URL atual do iframe
+              }
+
+              if (currentUrl.includes("/pedido/")) {
+                toast.success("Pedido realizado com sucesso!", {
+                  duration: 2000,
+                });
+              }
+
+              el.src = el.src;
             }}
             aria-label="Atualizar página"
             className="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-black/50 text-white/90 transition hover:bg-black/70 active:scale-95"
