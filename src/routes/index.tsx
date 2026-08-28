@@ -63,10 +63,15 @@ function Index() {
   };
 
   useEffect(() => {
-    const onPop = () => setActiveLink(null);
-    window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
-  }, []);
+    if (!activeLink) return;
+    // Bloqueia o botão voltar nativo: recria uma entrada no histórico
+    // toda vez que o usuário pressiona voltar, impedindo que saia do webview.
+    const trapBack = () => {
+      window.history.pushState({ webview: true }, "");
+    };
+    window.addEventListener("popstate", trapBack);
+    return () => window.removeEventListener("popstate", trapBack);
+  }, [activeLink]);
 
   useEffect(() => {
     if (!activeLink) return;
