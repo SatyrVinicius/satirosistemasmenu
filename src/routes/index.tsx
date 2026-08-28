@@ -91,32 +91,93 @@ function Index() {
     },
   });
 
+  const isFullscreen = () => {
+    return !!(
+      document.fullscreenElement ||
+      // @ts-expect-error vendor prefixed
+      document.webkitFullscreenElement ||
+      // @ts-expect-error vendor prefixed
+      document.msFullscreenElement
+    );
+  };
+
+  const requestFullscreen = async () => {
+    const el = document.documentElement as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+      msRequestFullscreen?: () => Promise<void> | void;
+    };
+    try {
+      if (el.requestFullscreen) {
+        await el.requestFullscreen();
+      } else if (el.webkitRequestFullscreen) {
+        await el.webkitRequestFullscreen();
+      } else if (el.msRequestFullscreen) {
+        await el.msRequestFullscreen();
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  const exitFullscreen = async () => {
+    const doc = document as Document & {
+      webkitExitFullscreen?: () => Promise<void> | void;
+      msExitFullscreen?: () => Promise<void> | void;
+    };
+    try {
+      if (doc.exitFullscreen) {
+        await doc.exitFullscreen();
+      } else if (doc.webkitExitFullscreen) {
+        await doc.webkitExitFullscreen();
+      } else if (doc.msExitFullscreen) {
+        await doc.msExitFullscreen();
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   useEffect(() => {
-    const onChange = () => setFullscreen(!!document.fullscreenElement);
+    const onChange = () => setFullscreen(isFullscreen());
     document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
+    document.addEventListener("webkitfullscreenchange", onChange);
+    document.addEventListener("msfullscreenchange", onChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange);
+      document.removeEventListener("webkitfullscreenchange", onChange);
+      document.removeEventListener("msfullscreenchange", onChange);
+    };
   }, []);
 
   useEffect(() => {
-    if (!amplia || document.fullscreenElement) return;
+    if (!amplia || isFullscreen()) return;
+
+    let triggered = false;
     const enter = () => {
-      document.documentElement.requestFullscreen?.().catch(() => {});
-      window.removeEventListener("pointerdown", enter);
+      if (triggered) return;
+      triggered = true;
+      requestFullscreen();
     };
-    document.documentElement.requestFullscreen?.().catch(() => {
-      // navegadores exigem gesto do usuário: tenta no primeiro toque
+
+    // tenta imediatamente; se falhar, aguarda o primeiro gesto do usuário
+    requestFullscreen().catch(() => {
       window.addEventListener("pointerdown", enter, { once: true });
+      window.addEventListener("touchstart", enter, { once: true });
+      window.addEventListener("click", enter, { once: true });
     });
-    return () => window.removeEventListener("pointerdown", enter);
+
+    return () => {
+      window.removeEventListener("pointerdown", enter);
+      window.removeEventListener("touchstart", enter);
+      window.removeEventListener("click", enter);
+    };
   }, [amplia]);
 
-
-
   const toggleFullscreen = () => {
-    if (document.fullscreenElement) {
-      document.exitFullscreen?.().catch(() => {});
+    if (isFullscreen()) {
+      exitFullscreen();
     } else {
-      document.documentElement.requestFullscreen?.().catch(() => {});
+      requestFullscreen();
     }
   };
 
