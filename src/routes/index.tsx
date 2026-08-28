@@ -144,42 +144,6 @@ function Index() {
     );
   }
 
-  if (activeLink) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black">
-        <iframe
-          ref={iframeRef}
-          src={activeLink}
-          title="Cardápio da mesa"
-          className="h-full w-full border-0"
-          allow="clipboard-write; geolocation; camera; microphone; payment"
-        />
-        {/* botão de atualizar no canto superior esquerdo — recarrega com cache */}
-        <button
-          type="button"
-          onClick={() => {
-            const iframe = iframeRef.current;
-            if (!iframe) return;
-            try {
-              // mesma origem: recarrega a URL atual mantendo o cache
-              iframe.contentWindow?.location.reload();
-              return;
-            } catch {
-              // cross-origin: sem acesso à URL atual, recarrega o iframe
-            }
-            // eslint-disable-next-line no-self-assign
-            iframe.src = iframe.src;
-          }}
-          className="absolute top-3 left-3 z-10 rounded-full bg-black/70 p-2.5 text-amber-300 shadow-lg backdrop-blur-sm transition hover:bg-black/90 active:scale-95"
-          aria-label="Atualizar página"
-        >
-          <RefreshCw className="h-5 w-5" />
-        </button>
-
-
-      </div>
-    );
-  }
 
 
   return (
