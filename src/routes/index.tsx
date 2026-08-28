@@ -55,22 +55,23 @@ function Index() {
   const [fullscreen, setFullscreen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
 
-
   const { data: lanchonete } = useQuery({
     queryKey: ["lanchonete", cod ?? "default"],
+    enabled: !!cod,
     queryFn: async () => {
-      let q = supabase
+      const { data, error } = await supabase
         .from("LANCHONETES")
-        .select("id,descricao,logo,walpaper,slogan,codigo_lanchonete,amplia");
-      if (cod) q = q.eq("codigo_lanchonete", cod);
-      const { data, error } = await q.limit(1);
+        .select("id,descricao,logo,walpaper,slogan,codigo_lanchonete,amplia")
+        .eq("codigo_lanchonete", cod)
+        .limit(1)
+        .single();
       if (error) throw error;
-      return (data?.[0] ?? null) as Lanchonete | null;
+      return data as Lanchonete | null;
     },
   });
 
   const amplia = lanchonete?.amplia === true;
-  const refCod = cod ?? lanchonete?.codigo_lanchonete ?? undefined;
+  const refCod = lanchonete?.codigo_lanchonete ?? undefined;
 
   const { data: mesas } = useQuery({
     queryKey: ["mesas", refCod],
