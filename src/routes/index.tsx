@@ -99,6 +99,26 @@ function Index() {
     };
   }, [activeLink]);
 
+  useEffect(() => {
+    if (!activeLink) return;
+
+    const interactionEvents = ["pointerdown", "touchstart", "click", "keydown", "scroll"];
+    interactionEvents.forEach((event) => {
+      window.addEventListener(event, resetInactivityTimer, { passive: true });
+    });
+
+    resetInactivityTimer();
+
+    return () => {
+      interactionEvents.forEach((event) => {
+        window.removeEventListener(event, resetInactivityTimer);
+      });
+      if (inactivityTimeoutRef.current) {
+        clearTimeout(inactivityTimeoutRef.current);
+      }
+    };
+  }, [activeLink]);
+
 
 
   const { data: lanchonete } = useQuery({
