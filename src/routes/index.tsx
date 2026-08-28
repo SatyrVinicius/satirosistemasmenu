@@ -394,6 +394,7 @@ function Index() {
             title="Webview"
             className="h-full w-full border-0"
             allow="fullscreen"
+            onLoad={resetInactivityTimer}
           />
         </div>
       )}
