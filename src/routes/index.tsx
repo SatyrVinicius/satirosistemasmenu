@@ -101,6 +101,55 @@ function Index() {
   }, []);
 
   useEffect(() => {
+    if (!activeLink) {
+      document.body.style.overscrollBehaviorY = "";
+      return;
+    }
+
+    document.body.style.overscrollBehaviorY = "none";
+
+    const onTouchStart = (e: TouchEvent) => {
+      touchStartY.current = e.touches[0]?.clientY ?? null;
+    };
+
+    const onTouchMove = (e: TouchEvent) => {
+      if (touchStartY.current == null) return;
+      const y = e.touches[0]?.clientY ?? touchStartY.current;
+      const delta = y - touchStartY.current;
+      const atTop = window.scrollY <= 0;
+
+      if (atTop && delta > 80 && !refreshing.current) {
+        e.preventDefault();
+        refreshing.current = true;
+        const iframe = iframeRef.current;
+        if (iframe) {
+          const currentSrc = iframe.src;
+          iframe.src = "about:blank";
+          setTimeout(() => {
+            iframe.src = currentSrc;
+            refreshing.current = false;
+          }, 80);
+        }
+      }
+    };
+
+    const onTouchEnd = () => {
+      touchStartY.current = null;
+    };
+
+    window.addEventListener("touchstart", onTouchStart, { passive: true });
+    window.addEventListener("touchmove", onTouchMove, { passive: false });
+    window.addEventListener("touchend", onTouchEnd, { passive: true });
+
+    return () => {
+      window.removeEventListener("touchstart", onTouchStart);
+      window.removeEventListener("touchmove", onTouchMove);
+      window.removeEventListener("touchend", onTouchEnd);
+      document.body.style.overscrollBehaviorY = "";
+    };
+  }, [activeLink]);
+
+  useEffect(() => {
     if (!amplia || document.fullscreenElement) return;
     const enter = () => {
       document.documentElement.requestFullscreen?.().catch(() => {});
