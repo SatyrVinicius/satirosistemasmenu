@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { Maximize, Minimize, RefreshCw, UtensilsCrossed } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Maximize, Minimize, UtensilsCrossed } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import wallpaperFallback from "@/assets/wallpaper.jpg";
@@ -53,8 +53,6 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
-  const [activeLink, setActiveLink] = useState<string | null>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
 
 
@@ -112,22 +110,6 @@ function Index() {
     return () => window.removeEventListener("pointerdown", enter);
   }, [amplia]);
 
-  // fecha o webview com a seta "voltar" do navegador
-  useEffect(() => {
-    if (!activeLink) return;
-    window.history.pushState({ webview: true }, "");
-    const onPop = () => setActiveLink(null);
-    window.addEventListener("popstate", onPop);
-    const prevBody = document.body.style.overscrollBehaviorY;
-    const prevHtml = document.documentElement.style.overscrollBehaviorY;
-    document.body.style.overscrollBehaviorY = "none";
-    document.documentElement.style.overscrollBehaviorY = "none";
-    return () => {
-      window.removeEventListener("popstate", onPop);
-      document.body.style.overscrollBehaviorY = prevBody;
-      document.documentElement.style.overscrollBehaviorY = prevHtml;
-    };
-  }, [activeLink]);
 
 
   const toggleFullscreen = () => {
@@ -162,42 +144,6 @@ function Index() {
     );
   }
 
-  if (activeLink) {
-    return (
-      <div className="fixed inset-0 z-50 bg-black">
-        <iframe
-          ref={iframeRef}
-          src={activeLink}
-          title="Cardápio da mesa"
-          className="h-full w-full border-0"
-          allow="clipboard-write; geolocation; camera; microphone; payment"
-        />
-        {/* botão de atualizar no canto superior esquerdo — recarrega com cache */}
-        <button
-          type="button"
-          onClick={() => {
-            const iframe = iframeRef.current;
-            if (!iframe) return;
-            try {
-              // mesma origem: recarrega a URL atual mantendo o cache
-              iframe.contentWindow?.location.reload();
-              return;
-            } catch {
-              // cross-origin: sem acesso à URL atual, recarrega o iframe
-            }
-            // eslint-disable-next-line no-self-assign
-            iframe.src = iframe.src;
-          }}
-          className="absolute top-3 left-3 z-10 rounded-full bg-black/70 p-2.5 text-amber-300 shadow-lg backdrop-blur-sm transition hover:bg-black/90 active:scale-95"
-          aria-label="Atualizar página"
-        >
-          <RefreshCw className="h-5 w-5" />
-        </button>
-
-
-      </div>
-    );
-  }
 
 
   return (
@@ -249,7 +195,7 @@ function Index() {
                     const href = /^https?:\/\//i.test(m.link_mesa)
                       ? m.link_mesa
                       : `https://${m.link_mesa}`;
-                    setActiveLink(href);
+                    window.location.href = href;
                   }}
 
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-700 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-amber-100 transition hover:bg-red-600 active:scale-95"
