@@ -53,6 +53,10 @@ export const Route = createFileRoute("/")({
 function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
+  const [activeLink, setActiveLink] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [pullY, setPullY] = useState(0);
+
 
   const { data: lanchonete } = useQuery({
     queryKey: ["lanchonete", cod ?? "default"],
