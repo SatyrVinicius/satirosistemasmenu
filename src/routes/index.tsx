@@ -55,6 +55,8 @@ function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
+  const [showPedidoPopup, setShowPedidoPopup] = useState(false);
+  const popupTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const inactivityTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
