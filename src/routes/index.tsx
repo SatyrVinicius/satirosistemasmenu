@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Maximize, Minimize, RefreshCw, UtensilsCrossed } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
