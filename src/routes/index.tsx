@@ -177,9 +177,10 @@ function Index() {
           type="button"
           onClick={() => {
             const iframe = iframeRef.current;
-            if (!iframe) return;
-            // recarrega o iframe respeitando o cache do navegador
-            iframe.src = iframe.src;
+            if (!iframe?.contentWindow) return;
+            // recarrega a URL atual do iframe (não a inicial), com cache
+            const current = iframe.contentWindow.location.href;
+            iframe.contentWindow.location.href = current;
           }}
           className="absolute top-3 left-3 z-10 rounded-full bg-black/70 p-2.5 text-amber-300 shadow-lg backdrop-blur-sm transition hover:bg-black/90 active:scale-95"
           aria-label="Atualizar página"
