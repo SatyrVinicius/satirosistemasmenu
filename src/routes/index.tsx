@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Maximize, Minimize, RefreshCw, UtensilsCrossed } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
@@ -54,7 +54,8 @@ function Index() {
   const { cod } = Route.useSearch();
   const [fullscreen, setFullscreen] = useState(false);
   const [activeLink, setActiveLink] = useState<string | null>(null);
-  const [reloadKey, setReloadKey] = useState(0);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
 
 
   const { data: lanchonete } = useQuery({
@@ -165,20 +166,21 @@ function Index() {
     return (
       <div className="fixed inset-0 z-50 bg-black">
         <iframe
-          key={reloadKey}
-          src={
-            reloadKey === 0
-              ? activeLink
-              : `${activeLink}${activeLink.includes("?") ? "&" : "?"}_r=${reloadKey}`
-          }
+          ref={iframeRef}
+          src={activeLink}
           title="Cardápio da mesa"
           className="h-full w-full border-0"
           allow="clipboard-write; geolocation; camera; microphone; payment"
         />
-        {/* botão de atualizar no canto superior esquerdo */}
+        {/* botão de atualizar no canto superior esquerdo — recarrega com cache */}
         <button
           type="button"
-          onClick={() => setReloadKey(Date.now())}
+          onClick={() => {
+            const iframe = iframeRef.current;
+            if (!iframe) return;
+            // recarrega o iframe respeitando o cache do navegador
+            iframe.src = iframe.src;
+          }}
           className="absolute top-3 left-3 z-10 rounded-full bg-black/70 p-2.5 text-amber-300 shadow-lg backdrop-blur-sm transition hover:bg-black/90 active:scale-95"
           aria-label="Atualizar página"
         >
@@ -240,7 +242,6 @@ function Index() {
                       ? m.link_mesa
                       : `https://${m.link_mesa}`;
                     setActiveLink(href);
-                    setReloadKey((k) => k + 1);
                   }}
 
                   className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-700 px-5 py-2.5 text-sm font-bold uppercase tracking-wider text-amber-100 transition hover:bg-red-600 active:scale-95"
