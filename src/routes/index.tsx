@@ -287,6 +287,7 @@ function Index() {
       {activeLink && (
         <div className="fixed inset-0 z-50 bg-black">
           <iframe
+            ref={iframeRef}
             src={activeLink}
             title="Webview da mesa"
             className="h-full w-full border-0"
