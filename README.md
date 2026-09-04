@@ -2,17 +2,9 @@
 
 quero que vc desenvolva uma pagina usando essa imagem como exemplo de icones imagens, botões e texto, leia os texto que tem na imagem
 
-This project was built with [Lovable](https://lovable.dev).
+Este projeto é desenvolvido e mantido pela Sátiro Sistemas.
 
-**Live app**: https://satirosistemasmenu.lovable.app
-
-## Build with Lovable
-
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/bd294395-1f51-48d8-ab4b-21adf502bbea).
-
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+**Aplicação**: menu digital da Sátiro Lanches
 
 ## Development
 
