@@ -2,6 +2,8 @@ FROM node:22-alpine AS build
 
 WORKDIR /app
 
+ENV NITRO_PRESET=node-server
+
 COPY package.json bun.lock bunfig.toml ./
 RUN npm install --include=dev --no-package-lock
 
@@ -15,6 +17,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
+ENV NITRO_HOST=0.0.0.0
+ENV NITRO_PORT=3000
 
 COPY --from=build /app/.output ./.output
 COPY --from=build /app/public ./public
